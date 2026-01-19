@@ -124,3 +124,31 @@ Build passes with no errors.
    - Screenshot analysis (Tab 6 - Visual Reality Check)
    - G2/Capterra enrichment (Tab 7 - Customer Voice Analysis)
    - Export functionality
+
+6. **Share Results Feature** (based on /retire implementation):
+
+   **Database Changes:**
+   - Add columns to `extraction_sessions`: `share_token TEXT`, `is_shared BOOLEAN DEFAULT false`, `shared_at TIMESTAMPTZ`
+   - Share token: 32-character hex string (128-bit entropy)
+
+   **Files to Create:**
+   - `src/lib/utils/share-token.ts` - Token generation (`crypto.randomBytes(16).toString('hex')`) and validation (`/^[a-f0-9]{32}$/`)
+   - `src/components/share/ShareModal.tsx` - Modal with toggle to enable/disable sharing, copy link button, open in new tab button
+   - `src/components/share/SharedResults.tsx` - Read-only view of extraction results for public access
+   - `src/app/share/[token]/page.tsx` - Public page route (no auth required)
+
+   **Database Queries to Add** (in `src/lib/supabase/queries.ts` or inline):
+   - `enableSharing(sessionId)` - Generate token, set `is_shared=true`, `shared_at=now()`
+   - `disableSharing(sessionId)` - Set `is_shared=false` (preserve token for re-enabling)
+   - `getSharedSession(token)` - Public query: fetch session where `share_token=token AND is_shared=true`
+
+   **Integration Points:**
+   - Add Share button to results page header (only shows for completed extractions)
+   - ShareModal opens on click, shows URL like `/share/{token}`
+   - Shared page renders read-only results with "Read-Only" badge and CTA to create own extraction
+
+   **Security:**
+   - Token validation before DB query
+   - `is_shared` flag controls access (not token existence)
+   - Shared view is read-only, no edit/delete actions
+   - Ownership check (`user_id`) on enable/disable operations
