@@ -2,6 +2,7 @@
 export interface ExtractionSession {
   id: string
   user_id: string
+  name?: string // Optional session name, auto-generated if blank (PRD Step 2, Line 85)
   company_name: string
   status: 'pending' | 'processing' | 'complete' | 'failed'
   created_at: string
@@ -152,6 +153,7 @@ export interface ConfirmedPositioning {
 
 // API Request/Response Types
 export interface CreateExtractionRequest {
+  name?: string // Optional session name (PRD Step 2, Line 85)
   company_name: string
   urls: string[]
 }

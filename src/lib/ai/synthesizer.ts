@@ -3,37 +3,68 @@ import { ExtractedElements, ExtractionUrl } from '@/types/database'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
-const SYNTHESIS_PROMPT = `You are an expert positioning strategist. Analyze extracted elements from multiple pages of a company website and synthesize their positioning.
+const SYNTHESIS_PROMPT = `You are a positioning analyst examining a B2B SaaS company's website.
+
+YOUR PERSPECTIVE:
+- You are a first-time visitor who knows nothing about this company
+- You have no insider context—only what the pages communicate
+- You notice what's said AND where it's said (structure = emphasis)
+- What appears in H1 is their #1 priority. What's buried in paragraphs is deprioritized.
+
+CRITICAL FRAMING:
+The HIERARCHY of content reveals positioning priorities:
+- H1 headline = The single most important claim
+- H2 headlines = Secondary value propositions
+- Body paragraphs = Supporting details (deprioritized)
+- Navigation labels = Strategic priorities (what deserves top-level attention)
+- Primary CTA = The action they most want visitors to take
+
+If their differentiation claim is in paragraph 4 but "trusted by 10,000 users" is the H1, that tells you what they're actually prioritizing—regardless of what they'd say in a strategy meeting.
 
 PAGES DATA:
 {PAGES_DATA}
 
-Based on ALL pages, synthesize:
+YOUR TASK:
 
-1. POSITIONING STATEMENT: Write a clear positioning statement in the format:
-   "For [target customer], [company] is the [category] that [key differentiator] because [proof point]."
+1. POSITIONING STATEMENT
+Write a single sentence: "We help [who] do [what] so they can [outcome]"
+Based ONLY on what the site says. Do not infer or improve—mirror what's there.
 
-2. CATEGORY: What market category does this company claim to be in?
+2. CATEGORY PLACEMENT
+What category is this company placing itself in?
+Be specific (not "software" but "sales engagement platform" or "AI writing assistant")
 
-3. VALUE HIERARCHY: Rank the top 5 value propositions by emphasis (considering frequency across pages, headline prominence, placement). Include which pages each appears on.
+3. VALUE HIERARCHY
+Rank the top 5 value themes by STRUCTURAL PROMINENCE:
+- What appears in H1s across pages = highest weight
+- What appears in H2s = secondary weight
+- What's only in body text = lowest weight
+- Frequency across pages is secondary to structural placement
 
-4. PRIMARY PERSONA: Based on target audience signals, who is the primary buyer persona? Include:
-   - Title/role
-   - Seniority level (if discernible)
-   - Industry (if specific)
-   - Their pain points
-   - Their desired outcomes
+4. PRIMARY PERSONA
+Based on target audience signals, who is the primary buyer?
+Note where this is structurally emphasized vs. buried.
+Flag where the site is unclear or contradictory.
 
-5. SECONDARY PERSONAS: Any other personas mentioned?
+5. SECONDARY PERSONAS
+Any other personas mentioned? How prominently?
 
-6. PAIN POINTS: Aggregate all pain points mentioned, with frequency count and pages.
+6. PAIN POINTS
+List every problem the site claims to solve.
+Note structural placement (H1/H2/body) for each.
 
-7. NAVIGATION ANALYSIS:
-   - What are the primary CTAs across pages?
-   - How consistent are they?
-   - Does nav structure align with stated priorities?
+7. NAVIGATION ANALYSIS
+- What do the top-level nav items reveal about strategic priorities?
+- What's conspicuously missing from navigation?
+- Primary CTAs across pages: what's the conversion strategy signal?
+  ("Start Free Trial" = PLG, "Request Demo" = sales-led, "Contact Us" = enterprise/unclear)
 
-8. MESSAGING VARIANTS: For key concepts, track how messaging varies across pages.
+8. MESSAGING VARIANTS
+For key concepts, track how messaging varies across pages.
+Inconsistency in both content AND structural emphasis matters.
+
+9. OVERALL CONSISTENCY SCORE
+0-100: How coherent is the positioning across all pages?
 
 Return as JSON:
 {
@@ -58,7 +89,7 @@ Return as JSON:
   "navigation_analysis": {
     "primary_ctas": ["string"],
     "cta_consistency_score": number,
-    "nav_priority_alignment": "string description"
+    "nav_priority_alignment": "string description of what nav reveals and what's missing"
   },
   "messaging_variants": [
     { "concept": "string", "variants": ["string"], "consistency_score": number }

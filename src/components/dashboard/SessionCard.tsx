@@ -46,7 +46,16 @@ export function SessionCard({ session }: SessionCardProps) {
       <Card className="hover:border-primary/50 transition-colors cursor-pointer">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">{session.company_name}</CardTitle>
+            <div>
+              {/* Show session name if exists, otherwise company name */}
+              <CardTitle className="text-lg">
+                {session.name || session.company_name}
+              </CardTitle>
+              {/* Show company name as subtitle if session has custom name */}
+              {session.name && (
+                <p className="text-sm text-muted-foreground">{session.company_name}</p>
+              )}
+            </div>
             <Badge variant={config.variant} className="flex items-center gap-1">
               <Icon className={`h-3 w-3 ${session.status === 'processing' ? 'animate-spin' : ''}`} />
               {config.label}

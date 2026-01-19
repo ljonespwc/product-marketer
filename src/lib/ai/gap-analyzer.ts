@@ -3,39 +3,83 @@ import { SynthesisResult } from './synthesizer'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
-const GAP_ANALYSIS_PROMPT = `You are a brutally honest positioning critic. Your job is to find the gaps, weaknesses, and "so what?" moments in a company's positioning.
+const GAP_ANALYSIS_PROMPT = `You are a critical analyst evaluating B2B SaaS positioning.
+
+YOUR MINDSET:
+- You are looking for weaknesses, not strengths
+- Vague claims are failures
+- Missing proof is a red flag
+- "Everyone says that" is not differentiation
+- Your job is to surface uncomfortable truths
+
+STRUCTURAL ANALYSIS LENS:
+A company's priorities are revealed by WHERE they place content:
+- H1 = What they think matters most
+- H2 = What they think matters second
+- Body text = What they're downplaying
+- Navigation = Strategic priorities
+- Primary CTA = Conversion strategy
+
+If important claims are structurally buried, that's a gap—regardless of whether the words exist somewhere on the site.
 
 SYNTHESIS DATA:
 {SYNTHESIS_DATA}
 
-Analyze critically and provide:
+YOUR TASK:
 
-1. SPECIFICITY SCORE (0-100): How specific vs generic is their messaging?
-   - 90-100: Highly specific with concrete numbers, named outcomes, clear differentiators
-   - 70-89: Mostly specific with some vague elements
-   - 40-69: Mix of specific and generic claims
-   - 0-39: Mostly generic, could apply to any competitor
+1. SPECIFICITY SCORE (0-100)
+Rate how concrete vs. vague the overall messaging is.
+CRITICAL: Structurally prominent but vague claims are WORSE than buried vague claims.
+- 90-100: H1s contain specific, concrete claims with numbers/outcomes
+- 70-89: Mostly specific, some vague elements
+- 40-69: Mix of specific and generic—or specific claims buried while vague claims prominent
+- 0-39: Generic messaging dominates, especially in H1/H2 positions
 
-2. SO WHAT GAPS: For each claim that doesn't answer "so what does that mean for me?", identify:
-   - The claim
-   - What context is missing
-   - Example: "AI-powered" - missing what outcome the AI delivers
+2. "SO WHAT?" GAPS
+For claims that don't answer "why should I care?":
+- The claim
+- Its structural placement (H1/H2/body)
+- What's missing
+H1-level claims without clear "so what" = critical issue.
+Example: "Trusted by thousands" as H1 uses most valuable real estate to say something that doesn't answer "so what?"
 
-3. DIFFERENTIATION STRENGTH:
-   - "strong": Clear unique positioning that competitors can't claim
-   - "moderate": Some differentiation but not unique
-   - "weak": Differentiation exists but easily copied
-   - "generic": Could be any company in the space
+3. DIFFERENTIATION STRENGTH
+What on this site could NOT be copy-pasted onto a competitor's homepage?
+- "strong": Unique claims in prominent positions (H1/H2)
+- "moderate": Some uniqueness but not structurally emphasized
+- "weak": Differentiation exists but buried in body text
+- "generic": H1s and H2s contain only category-standard claims
 
-4. 10-SECOND TAKEAWAY: What would a visitor remember after 10 seconds on their homepage? Be honest - is it memorable and clear, or forgettable and confusing?
+Note: If differentiation exists but is structurally buried, that's a critical gap.
 
-5. CRITICAL OBSERVATIONS: List 3-5 blunt, uncomfortable truths about their positioning. Be direct and specific. Examples:
-   - "You claim to be 'the leader' but provide zero evidence"
-   - "Your homepage says 5 different things - what ARE you?"
-   - "Every competitor makes the exact same claims"
+4. 10-SECOND TAKEAWAY
+Based on H1, H2s, and primary CTA only:
+What would a busy buyer conclude from 10 seconds on the homepage?
+Be honest, not kind. Is it memorable or forgettable?
 
-6. PROOF SCORE (0-100): How well-substantiated are their claims?
-   - Count claims with specific proof vs claims without
+5. CRITICAL OBSERVATIONS
+List 3-5 blunt, uncomfortable truths. Include structural gaps:
+- "Your differentiation ('brand voice AI') is buried in paragraph 4 while 'trusted by thousands' is your H1"
+- "Navigation has no 'Why Us' or competitor comparison—signals weak differentiation confidence"
+- "CTAs signal PLG ('Start Free Trial') but messaging claims 'enterprise-grade'—mixed signals"
+- "Your H1 is '[Generic claim everyone makes]'—you're leading with commoditized value"
+
+6. PROOF SCORE (0-100)
+Rate strength of evidence. Consider BOTH existence and placement.
+Proof that's buried when it should be prominent = lower score.
+
+7. NAVIGATION GAPS
+What's conspicuously missing from top-level navigation?
+- No "Why Us" or "vs. Competitors" = weak differentiation confidence
+- No "Pricing" = friction/enterprise signal
+- No "Customers" or "Case Studies" = proof gap
+- No "Security" despite enterprise claims = credibility gap
+
+8. CTA CONSISTENCY
+Does the primary CTA match the positioning?
+- "Start Free Trial" + "enterprise messaging" = mismatch
+- "Request Demo" + "self-serve messaging" = mismatch
+- "Contact Us" for everything = unclear value prop
 
 Return as JSON:
 {
@@ -44,20 +88,22 @@ Return as JSON:
     { "claim": "string", "missing_context": "string" }
   ],
   "differentiation_strength": "strong|moderate|weak|generic",
-  "ten_second_takeaway": "string - be honest about what sticks",
-  "critical_observations": ["string - uncomfortable truths"],
+  "ten_second_takeaway": "string - be honest about what sticks (or doesn't)",
+  "critical_observations": ["string - uncomfortable truths including structural gaps"],
   "proof_score": number,
   "proof_points": [
     {
       "claim": "string",
       "proof_type": "string",
       "specificity_score": number,
-      "location": "string",
+      "location": "where it appears (H1/H2/body/buried)",
       "verdict": "strong|weak|missing"
     }
   ],
-  "unsubstantiated_claims": ["string - claims without proof"]
+  "unsubstantiated_claims": ["string - claims without proof, especially prominent ones"]
 }
+
+Be direct. Be uncomfortable. Be useful.
 `
 
 export interface GapAnalysisResult {

@@ -46,6 +46,7 @@ export async function POST(request: Request) {
     .from('extraction_sessions')
     .insert({
       user_id: user.id,
+      name: body.name, // Optional session name (PRD Step 2, Line 85)
       company_name: body.company_name,
       status: 'pending',
     })

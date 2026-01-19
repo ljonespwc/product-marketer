@@ -11,6 +11,7 @@ import Link from 'next/link'
 
 export default function NewExtractionPage() {
   const router = useRouter()
+  const [sessionName, setSessionName] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [urls, setUrls] = useState(['', '', ''])
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -75,10 +76,15 @@ export default function NewExtractionPage() {
     setIsSubmitting(true)
 
     try {
+      // Auto-generate session name if blank (PRD Step 2, Line 85)
+      const generatedName = sessionName.trim() ||
+        `${companyName} - ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
+
       const response = await fetch('/api/extractions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          name: generatedName,
           company_name: companyName,
           urls: urls.filter(u => u.trim()).map(u =>
             u.startsWith('http') ? u : `https://${u}`
@@ -119,6 +125,20 @@ export default function NewExtractionPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Session Name - PRD Step 2, Line 85 */}
+              <div className="space-y-2">
+                <Label htmlFor="sessionName">Session Name (optional)</Label>
+                <Input
+                  id="sessionName"
+                  placeholder="e.g., Q1 2026 Positioning Audit"
+                  value={sessionName}
+                  onChange={(e) => setSessionName(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Leave blank to auto-generate (e.g., &quot;Acme Inc - Jan 2026&quot;)
+                </p>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="company">Company Name</Label>
                 <Input
@@ -130,11 +150,22 @@ export default function NewExtractionPage() {
               </div>
 
               <div className="space-y-4">
-                <Label>Website URLs (3-10 pages from the same domain)</Label>
+                <div>
+                  <Label>Website URLs (3-10 pages from the same domain)</Label>
+                  {/* Suggested URL types - PRD Step 2, Lines 98-103 */}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Suggested pages: Homepage, Features/Product, Pricing, About/Company, Case Study, Landing Pages
+                  </p>
+                </div>
                 {urls.map((url, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
-                      placeholder={`https://example.com/${index === 0 ? '' : index === 1 ? 'pricing' : 'features'}`}
+                      placeholder={
+                        index === 0 ? 'https://example.com (homepage)' :
+                        index === 1 ? 'https://example.com/pricing' :
+                        index === 2 ? 'https://example.com/features' :
+                        'https://example.com/...'
+                      }
                       value={url}
                       onChange={(e) => updateUrl(index, e.target.value)}
                     />
