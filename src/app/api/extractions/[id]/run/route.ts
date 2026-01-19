@@ -25,6 +25,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     .from('extraction_sessions')
     .select('*')
     .eq('id', id)
+    .eq('user_id', user.id)
     .single()
 
   if (!session) {
@@ -35,11 +36,12 @@ export async function POST(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Session already processed' }, { status: 400 })
   }
 
-  // Update session to processing
+  // Update session to processing (include user_id to prevent race condition)
   await supabase
     .from('extraction_sessions')
     .update({ status: 'processing' })
     .eq('id', id)
+    .eq('user_id', user.id)
 
   // Start async processing (don't await - let client poll for status)
   processExtraction(id, supabase).catch(error => {

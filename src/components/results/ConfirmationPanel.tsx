@@ -25,14 +25,17 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
   })
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     setSaved(false)
+    setError('')
   }
 
   const handleSave = async () => {
     setIsSaving(true)
+    setError('')
     try {
       const response = await fetch(`/api/extractions/${sessionId}/confirm`, {
         method: 'POST',
@@ -41,9 +44,12 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
       })
       if (response.ok) {
         setSaved(true)
+      } else {
+        const data = await response.json()
+        setError(data.error || 'Failed to save')
       }
     } catch (err) {
-      console.error('Failed to save confirmation:', err)
+      setError('Failed to save. Please try again.')
     } finally {
       setIsSaving(false)
     }
@@ -117,6 +123,10 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
             />
           </div>
         </div>
+
+        {error && (
+          <p className="text-sm text-destructive">{error}</p>
+        )}
 
         <Button onClick={handleSave} className="w-full" disabled={isSaving}>
           {isSaving ? (

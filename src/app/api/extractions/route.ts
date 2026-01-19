@@ -14,6 +14,7 @@ export async function GET() {
   const { data: sessions, error } = await supabase
     .from('extraction_sessions')
     .select('*')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) {

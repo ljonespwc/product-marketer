@@ -20,6 +20,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     .from('extraction_sessions')
     .select('id')
     .eq('id', id)
+    .eq('user_id', user.id)
     .single()
 
   if (!session) {
