@@ -35,9 +35,9 @@ export async function POST(request: Request) {
 
   const body: CreateExtractionRequest = await request.json()
 
-  if (!body.company_name || !body.urls || body.urls.length < 3) {
+  if (!body.company_name || !body.urls || body.urls.length < 1) {
     return NextResponse.json(
-      { error: 'Company name and at least 3 URLs required' },
+      { error: 'Company name and at least 1 URL required' },
       { status: 400 }
     )
   }

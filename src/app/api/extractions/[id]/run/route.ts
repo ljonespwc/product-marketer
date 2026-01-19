@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { scrapeUrl } from '@/lib/scraper/jina'
-import { extractElements } from '@/lib/ai/element-extractor'
-import { synthesizePositioning } from '@/lib/ai/synthesizer'
-import { analyzeGaps } from '@/lib/ai/gap-analyzer'
-import { ExtractionUrl } from '@/types/database'
+import { extractRichElements, richToLegacyElements } from '@/lib/ai/element-extractor'
+import { collectEvidence } from '@/lib/ai/evidence-collector'
+import { synthesizeWithEvidence } from '@/lib/ai/synthesizer'
+import { analyzeGapsWithEvidence } from '@/lib/ai/gap-analyzer'
+import { ExtractionUrl, RichExtractedElements, CriticalObservation } from '@/types/database'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -63,7 +64,9 @@ async function processExtraction(sessionId: string, supabase: Awaited<ReturnType
       throw new Error('No URLs found')
     }
 
-    // Phase 1: Scrape all URLs
+    // Phase 1: Scrape all URLs and extract rich elements
+    console.log(`[Pipeline] Starting scrape and extraction for ${urls.length} URLs`)
+
     for (const urlRecord of urls) {
       await supabase
         .from('extraction_urls')
@@ -91,14 +94,19 @@ async function processExtraction(sessionId: string, supabase: Awaited<ReturnType
         })
         .eq('id', urlRecord.id)
 
-      // Phase 2: Extract elements
-      const elements = await extractElements(scrapeResult.markdown!)
+      // Phase 2: Extract RICH elements (enhanced with citations)
+      console.log(`[Pipeline] Extracting rich elements from ${urlRecord.url}`)
+      const richElements = await extractRichElements(scrapeResult.markdown!)
 
-      if (elements) {
+      if (richElements) {
+        // Convert to legacy format for backwards compatibility
+        const legacyElements = richToLegacyElements(richElements)
+
         await supabase
           .from('extraction_urls')
           .update({
-            extracted_elements: elements,
+            extracted_elements: legacyElements,
+            rich_elements: richElements,
             scrape_status: 'complete',
           })
           .eq('id', urlRecord.id)
@@ -120,8 +128,8 @@ async function processExtraction(sessionId: string, supabase: Awaited<ReturnType
       .eq('session_id', sessionId)
 
     const successfulUrls = (processedUrls || []).filter(
-      (u: ExtractionUrl) => u.scrape_status === 'complete' && u.extracted_elements
-    )
+      (u: ExtractionUrl) => u.scrape_status === 'complete' && u.rich_elements
+    ) as (ExtractionUrl & { raw_markdown: string; rich_elements: RichExtractedElements })[]
 
     if (successfulUrls.length === 0) {
       await supabase
@@ -131,10 +139,18 @@ async function processExtraction(sessionId: string, supabase: Awaited<ReturnType
       return
     }
 
-    // Phase 3: Cross-page synthesis
-    const synthesis = await synthesizePositioning(successfulUrls as ExtractionUrl[])
+    // Phase 3: Collect evidence from all pages
+    console.log(`[Pipeline] Collecting evidence from ${successfulUrls.length} pages`)
+    const evidenceResult = await collectEvidence(
+      successfulUrls.map(u => ({
+        url: u.url,
+        raw_markdown: u.raw_markdown,
+        rich_elements: u.rich_elements,
+      }))
+    )
 
-    if (!synthesis) {
+    if (!evidenceResult) {
+      console.error('[Pipeline] Evidence collection failed')
       await supabase
         .from('extraction_sessions')
         .update({ status: 'failed' })
@@ -142,21 +158,66 @@ async function processExtraction(sessionId: string, supabase: Awaited<ReturnType
       return
     }
 
-    // Phase 4: Gap analysis
-    const gaps = await analyzeGaps(synthesis)
+    console.log(`[Pipeline] Collected ${evidenceResult.quote_count} quotes, ${evidenceResult.stat_count} stats, ${evidenceResult.voice_count} customer voices`)
 
-    // Save results
+    // Phase 4: Cross-page synthesis with evidence
+    console.log('[Pipeline] Synthesizing positioning with evidence')
+    const synthesis = await synthesizeWithEvidence(
+      successfulUrls.map(u => ({
+        url: u.url,
+        raw_markdown: u.raw_markdown,
+        rich_elements: u.rich_elements,
+      })),
+      evidenceResult.evidence_bank
+    )
+
+    if (!synthesis) {
+      console.error('[Pipeline] Synthesis failed')
+      await supabase
+        .from('extraction_sessions')
+        .update({ status: 'failed' })
+        .eq('id', sessionId)
+      return
+    }
+
+    // Phase 5: Gap analysis with evidence
+    console.log('[Pipeline] Analyzing gaps with evidence')
+    const gaps = await analyzeGapsWithEvidence(
+      synthesis,
+      evidenceResult.evidence_bank,
+      successfulUrls.map(u => ({
+        url: u.url,
+        raw_markdown: u.raw_markdown,
+        rich_elements: u.rich_elements,
+      }))
+    )
+
+    // Save results with new enhanced fields
     const resultsData = {
       session_id: sessionId,
+
+      // Positioning Synthesis
       positioning_statement: synthesis.positioning_statement,
       category_claimed: synthesis.category_claimed,
       value_hierarchy: synthesis.value_hierarchy,
+      positioning_confidence: synthesis.positioning_confidence,
+      positioning_evidence: synthesis.positioning_evidence,
+
+      // ICP Extraction
       primary_persona: synthesis.primary_persona,
       secondary_personas: synthesis.secondary_personas,
       pain_points: synthesis.pain_points,
+
+      // Navigation & Consistency
       navigation_analysis: synthesis.navigation_analysis,
       messaging_variants: synthesis.messaging_variants,
       overall_consistency_score: synthesis.overall_consistency_score,
+      cross_page_contradictions: synthesis.cross_page_contradictions,
+
+      // Evidence Bank
+      evidence_bank: evidenceResult.evidence_bank,
+
+      // Gap Analysis
       ...(gaps && {
         specificity_score: gaps.specificity_score,
         so_what_gaps: gaps.so_what_gaps,
@@ -166,6 +227,9 @@ async function processExtraction(sessionId: string, supabase: Awaited<ReturnType
         proof_score: gaps.proof_score,
         proof_points: gaps.proof_points,
         unsubstantiated_claims: gaps.unsubstantiated_claims,
+        structural_misalignments: gaps.structural_misalignments,
+        actionable_recommendations: gaps.actionable_recommendations,
+        executive_summary: gaps.executive_summary,
       }),
     }
 
@@ -178,6 +242,8 @@ async function processExtraction(sessionId: string, supabase: Awaited<ReturnType
       .from('extraction_sessions')
       .update({ status: 'complete' })
       .eq('id', sessionId)
+
+    console.log('[Pipeline] Extraction complete')
 
   } catch (error) {
     console.error('Pipeline error:', error)

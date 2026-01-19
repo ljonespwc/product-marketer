@@ -13,7 +13,7 @@ export function NewExtractionForm() {
   const router = useRouter()
   const [sessionName, setSessionName] = useState('')
   const [companyName, setCompanyName] = useState('')
-  const [urls, setUrls] = useState(['', '', ''])
+  const [urls, setUrls] = useState([''])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -24,7 +24,7 @@ export function NewExtractionForm() {
   }
 
   const removeUrl = (index: number) => {
-    if (urls.length > 3) {
+    if (urls.length > 1) {
       setUrls(urls.filter((_, i) => i !== index))
     }
   }
@@ -37,8 +37,8 @@ export function NewExtractionForm() {
 
   const validateUrls = () => {
     const filledUrls = urls.filter(u => u.trim())
-    if (filledUrls.length < 3) {
-      return 'Please provide at least 3 URLs'
+    if (filledUrls.length < 1) {
+      return 'Please provide at least 1 URL'
     }
 
     // Check same domain
@@ -120,7 +120,7 @@ export function NewExtractionForm() {
           <CardHeader>
             <CardTitle className="bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">New Extraction</CardTitle>
             <CardDescription>
-              Enter your company name and 3-10 pages from your website to analyze
+              Enter your company name and 1-10 pages from your website to analyze
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -153,7 +153,7 @@ export function NewExtractionForm() {
 
               <div className="space-y-4">
                 <div>
-                  <Label>Website URLs (3-10 pages from the same domain)</Label>
+                  <Label>Website URLs (1-10 pages from the same domain)</Label>
                   {/* Suggested URL types - PRD Step 2, Lines 98-103 */}
                   <p className="text-xs text-muted-foreground mt-1">
                     Suggested pages: Homepage, Features/Product, Pricing, About/Company, Case Study, Landing Pages
@@ -172,7 +172,7 @@ export function NewExtractionForm() {
                       onChange={(e) => updateUrl(index, e.target.value)}
                       className="rounded-xl"
                     />
-                    {urls.length > 3 && (
+                    {urls.length > 1 && (
                       <Button
                         type="button"
                         variant="ghost"
