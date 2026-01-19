@@ -17,10 +17,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
+      <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Mirror Your Positioning</CardTitle>
+          <CardTitle className="text-2xl bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">Mirror Your Positioning</CardTitle>
           <CardDescription>
             Analyze your website&apos;s messaging and extract positioning insights
           </CardDescription>

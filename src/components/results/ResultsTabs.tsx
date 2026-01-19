@@ -19,7 +19,7 @@ export function ResultsTabs({ data }: ResultsTabsProps) {
 
   if (!results) {
     return (
-      <div className="text-center py-12 border rounded-lg bg-muted/20">
+      <div className="text-center py-12 border rounded-2xl bg-white/50 shadow-lg">
         <p className="text-muted-foreground">No results available</p>
       </div>
     )
@@ -28,14 +28,14 @@ export function ResultsTabs({ data }: ResultsTabsProps) {
   return (
     <Tabs defaultValue="positioning" className="w-full">
       {/* PRD specifies 7 tabs - 5 core + 2 optional enrichment (Visual, Customer Voice) */}
-      <TabsList className="grid w-full grid-cols-7">
-        <TabsTrigger value="positioning" className="text-xs px-1">Positioning</TabsTrigger>
-        <TabsTrigger value="icp" className="text-xs px-1">ICP</TabsTrigger>
-        <TabsTrigger value="proof" className="text-xs px-1">Proof</TabsTrigger>
-        <TabsTrigger value="consistency" className="text-xs px-1">Consistency</TabsTrigger>
-        <TabsTrigger value="observations" className="text-xs px-1">Observations</TabsTrigger>
-        <TabsTrigger value="visual" className="text-xs px-1">Visual</TabsTrigger>
-        <TabsTrigger value="voice" className="text-xs px-1">Voice</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-7 bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-lg">
+        <TabsTrigger value="positioning" className="text-xs px-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:via-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">Positioning</TabsTrigger>
+        <TabsTrigger value="icp" className="text-xs px-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:via-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">ICP</TabsTrigger>
+        <TabsTrigger value="proof" className="text-xs px-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:via-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">Proof</TabsTrigger>
+        <TabsTrigger value="consistency" className="text-xs px-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:via-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">Consistency</TabsTrigger>
+        <TabsTrigger value="observations" className="text-xs px-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:via-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">Observations</TabsTrigger>
+        <TabsTrigger value="visual" className="text-xs px-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:via-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">Visual</TabsTrigger>
+        <TabsTrigger value="voice" className="text-xs px-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:via-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white">Voice</TabsTrigger>
       </TabsList>
 
       {/* Tab 1: Positioning Synthesis - PRD Lines 158-212 */}

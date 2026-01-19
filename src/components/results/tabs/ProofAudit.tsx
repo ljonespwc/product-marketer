@@ -9,15 +9,23 @@ interface ProofAuditProps {
   results: ExtractionResults
 }
 
+// Score color helper
+function getScoreColors(score: number) {
+  if (score >= 90) return { text: 'text-emerald-600', bg: 'bg-emerald-50', bar: 'bg-emerald-500', border: 'border-emerald-200' }
+  if (score >= 70) return { text: 'text-amber-600', bg: 'bg-amber-50', bar: 'bg-amber-500', border: 'border-amber-200' }
+  if (score >= 40) return { text: 'text-orange-600', bg: 'bg-orange-50', bar: 'bg-orange-500', border: 'border-orange-200' }
+  return { text: 'text-red-600', bg: 'bg-red-50', bar: 'bg-red-500', border: 'border-red-200' }
+}
+
 export function ProofAudit({ results }: ProofAuditProps) {
   const getVerdictIcon = (verdict: string) => {
     switch (verdict) {
       case 'strong':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-emerald-500" />
       case 'weak':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        return <AlertTriangle className="h-4 w-4 text-amber-500" />
       case 'missing':
-        return <XCircle className="h-4 w-4 text-destructive" />
+        return <XCircle className="h-4 w-4 text-red-500" />
       default:
         return null
     }
@@ -25,38 +33,37 @@ export function ProofAudit({ results }: ProofAuditProps) {
 
   const getVerdictColor = (verdict: string) => {
     switch (verdict) {
-      case 'strong': return 'bg-green-500/10 text-green-700 border-green-200'
-      case 'weak': return 'bg-yellow-500/10 text-yellow-700 border-yellow-200'
-      case 'missing': return 'bg-red-500/10 text-red-700 border-red-200'
+      case 'strong': return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      case 'weak': return 'bg-amber-50 text-amber-700 border-amber-200'
+      case 'missing': return 'bg-red-50 text-red-700 border-red-200'
       default: return ''
     }
   }
 
+  const scoreColors = results.proof_score !== undefined ? getScoreColors(results.proof_score) : null
+
   return (
     <div className="space-y-4 mt-4">
-      <Card>
-        <CardHeader>
+      <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
+        <CardHeader className="border-b border-orange-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Award className="h-5 w-5" />
+              <Award className="h-5 w-5 text-orange-500" />
               <CardTitle className="text-base">Proof Score</CardTitle>
             </div>
-            {results.proof_score !== undefined && (
-              <div className="text-2xl font-bold">
+            {results.proof_score !== undefined && scoreColors && (
+              <div className={`text-2xl font-bold ${scoreColors.text}`}>
                 {results.proof_score}
                 <span className="text-sm text-muted-foreground font-normal">/100</span>
               </div>
             )}
           </div>
         </CardHeader>
-        <CardContent>
-          {results.proof_score !== undefined ? (
+        <CardContent className="pt-4">
+          {results.proof_score !== undefined && scoreColors ? (
             <div className="w-full bg-muted rounded-full h-3">
               <div
-                className={`h-3 rounded-full transition-all ${
-                  results.proof_score >= 70 ? 'bg-green-500' :
-                  results.proof_score >= 40 ? 'bg-yellow-500' : 'bg-destructive'
-                }`}
+                className={`h-3 rounded-full transition-all ${scoreColors.bar}`}
                 style={{ width: `${results.proof_score}%` }}
               />
             </div>
@@ -66,17 +73,17 @@ export function ProofAudit({ results }: ProofAuditProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
+        <CardHeader className="border-b border-orange-100">
           <CardTitle className="text-base">Proof Points</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {results.proof_points && results.proof_points.length > 0 ? (
             <div className="space-y-3">
               {results.proof_points.map((proof, index) => (
                 <div
                   key={index}
-                  className={`p-3 border rounded-lg ${getVerdictColor(proof.verdict)}`}
+                  className={`p-3 border rounded-xl ${getVerdictColor(proof.verdict)}`}
                 >
                   <div className="flex items-start gap-3">
                     {getVerdictIcon(proof.verdict)}
@@ -107,18 +114,18 @@ export function ProofAudit({ results }: ProofAuditProps) {
       </Card>
 
       {results.unsubstantiated_claims && results.unsubstantiated_claims.length > 0 && (
-        <Card>
-          <CardHeader>
+        <Card className="shadow-lg border-amber-200 bg-amber-50/80 backdrop-blur-sm">
+          <CardHeader className="border-b border-amber-200">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              <CardTitle className="text-base">Unsubstantiated Claims</CardTitle>
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <CardTitle className="text-base text-amber-800">Unsubstantiated Claims</CardTitle>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <ul className="space-y-2">
               {results.unsubstantiated_claims.map((claim, index) => (
-                <li key={index} className="text-sm flex items-start gap-2">
-                  <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                <li key={index} className="text-sm flex items-start gap-2 text-amber-900">
+                  <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                   {claim}
                 </li>
               ))}

@@ -50,23 +50,23 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
   }
 
   return (
-    <Card className="sticky top-4">
-      <CardHeader>
-        <CardTitle className="text-lg">Confirm Your Positioning</CardTitle>
+    <Card className="sticky top-4 shadow-xl bg-white/90 backdrop-blur-sm">
+      <CardHeader className="border-b border-orange-100">
+        <CardTitle className="text-lg bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">Confirm Your Positioning</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-4">
         <p className="text-sm text-muted-foreground">
           Review and edit the extracted positioning. Save your confirmed version.
         </p>
 
-        <Separator />
+        <Separator className="bg-orange-100" />
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="positioning">Positioning Statement</Label>
             <textarea
               id="positioning"
-              className="w-full min-h-[80px] px-3 py-2 text-sm border rounded-md bg-background resize-none"
+              className="w-full min-h-[80px] px-3 py-2 text-sm border rounded-xl bg-background resize-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               value={formData.positioning_statement}
               onChange={(e) => handleChange('positioning_statement', e.target.value)}
               placeholder="We are [category] that helps [persona] achieve [outcome] through [differentiator]"
@@ -80,6 +80,7 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
               value={formData.category}
               onChange={(e) => handleChange('category', e.target.value)}
               placeholder="e.g., CRM software"
+              className="rounded-xl"
             />
           </div>
 
@@ -90,6 +91,7 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
               value={formData.primary_value_prop}
               onChange={(e) => handleChange('primary_value_prop', e.target.value)}
               placeholder="Your #1 value proposition"
+              className="rounded-xl"
             />
           </div>
 
@@ -100,6 +102,7 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
               value={formData.target_persona}
               onChange={(e) => handleChange('target_persona', e.target.value)}
               placeholder="e.g., Sales Manager"
+              className="rounded-xl"
             />
           </div>
 
@@ -110,6 +113,7 @@ export function ConfirmationPanel({ sessionId, results, confirmed }: Confirmatio
               value={formData.key_differentiator}
               onChange={(e) => handleChange('key_differentiator', e.target.value)}
               placeholder="What makes you different"
+              className="rounded-xl"
             />
           </div>
         </div>

@@ -14,22 +14,22 @@ interface SessionCardProps {
 const statusConfig = {
   pending: {
     label: 'Pending',
-    variant: 'secondary' as const,
+    className: 'bg-amber-100 text-amber-700 border-amber-200',
     icon: Clock,
   },
   processing: {
     label: 'Processing',
-    variant: 'default' as const,
+    className: 'bg-blue-100 text-blue-700 border-blue-200',
     icon: Loader2,
   },
   complete: {
     label: 'Complete',
-    variant: 'default' as const,
+    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
     icon: CheckCircle,
   },
   failed: {
     label: 'Failed',
-    variant: 'destructive' as const,
+    className: 'bg-red-100 text-red-700 border-red-200',
     icon: AlertCircle,
   },
 }
@@ -43,7 +43,7 @@ export function SessionCard({ session }: SessionCardProps) {
 
   return (
     <Link href={href}>
-      <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+      <Card className="hover:border-orange-300 hover:shadow-xl transition-all cursor-pointer bg-white/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
@@ -56,7 +56,7 @@ export function SessionCard({ session }: SessionCardProps) {
                 <p className="text-sm text-muted-foreground">{session.company_name}</p>
               )}
             </div>
-            <Badge variant={config.variant} className="flex items-center gap-1">
+            <Badge variant="outline" className={`flex items-center gap-1 ${config.className}`}>
               <Icon className={`h-3 w-3 ${session.status === 'processing' ? 'animate-spin' : ''}`} />
               {config.label}
             </Badge>
@@ -67,7 +67,7 @@ export function SessionCard({ session }: SessionCardProps) {
             <span>
               Created {formatDistanceToNow(new Date(session.created_at), { addSuffix: true })}
             </span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4 text-orange-500" />
           </div>
         </CardContent>
       </Card>

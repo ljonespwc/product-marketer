@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ExtractionResults } from '@/types/database'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Target } from 'lucide-react'
 
 interface PositioningSynthesisProps {
   results: ExtractionResults
@@ -26,14 +26,17 @@ export function PositioningSynthesis({ results }: PositioningSynthesisProps) {
 
   return (
     <div className="space-y-4 mt-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Positioning Statement</CardTitle>
+      <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
+        <CardHeader className="border-b border-orange-100">
+          <div className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-orange-500" />
+            <CardTitle className="text-base">Positioning Statement</CardTitle>
+          </div>
           <CardDescription>
             This is what your site communicates. Edit in the confirmation panel if it&apos;s not what you intended.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {results.positioning_statement ? (
             <p className="text-lg">{results.positioning_statement}</p>
           ) : (
@@ -42,16 +45,16 @@ export function PositioningSynthesis({ results }: PositioningSynthesisProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
+        <CardHeader className="border-b border-orange-100">
           <CardTitle className="text-base">Category Claimed</CardTitle>
           <CardDescription>
             Based on your messaging, you&apos;re positioning as this category. Is this where you want to compete?
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {results.category_claimed ? (
-            <Badge variant="secondary" className="text-base px-3 py-1">
+            <Badge className="text-base px-4 py-2 bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-white">
               {results.category_claimed}
             </Badge>
           ) : (
@@ -60,20 +63,20 @@ export function PositioningSynthesis({ results }: PositioningSynthesisProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card className="shadow-lg bg-white/90 backdrop-blur-sm">
+        <CardHeader className="border-b border-orange-100">
           <CardTitle className="text-base">Value Hierarchy</CardTitle>
           <CardDescription>
             Ranked by structural prominence: H1s = highest weight, H2s = secondary, body text = lowest.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {results.value_hierarchy && results.value_hierarchy.length > 0 ? (
             <div className="space-y-3">
               {results.value_hierarchy.map((item, index) => (
                 <div key={index}>
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-white flex items-center justify-center text-sm font-medium">
                       {item.rank}
                     </div>
                     <div className="flex-1">
@@ -94,7 +97,7 @@ export function PositioningSynthesis({ results }: PositioningSynthesisProps) {
                     </div>
                   </div>
                   {index < results.value_hierarchy!.length - 1 && (
-                    <Separator className="my-3" />
+                    <Separator className="my-3 bg-orange-100" />
                   )}
                 </div>
               ))}
@@ -106,27 +109,27 @@ export function PositioningSynthesis({ results }: PositioningSynthesisProps) {
       </Card>
 
       {/* Structural Emphasis Gaps - PRD Section 4, Lines 201-212 */}
-      <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
-        <CardHeader>
+      <Card className="shadow-lg border-amber-200 bg-amber-50/80 backdrop-blur-sm">
+        <CardHeader className="border-b border-amber-200">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <CardTitle className="text-base">Structural Emphasis Gaps</CardTitle>
+            <CardTitle className="text-base text-amber-800">Structural Emphasis Gaps</CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-amber-700">
             Where your content hierarchy doesn&apos;t match apparent strategy. If differentiation is in body text while generic claims are H1, that&apos;s a structural positioning mistake.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {structuralGaps.length > 0 ? (
             <div className="space-y-3">
               {structuralGaps.map((gap, index) => (
-                <div key={index} className="p-3 bg-background border rounded-lg">
-                  <p className="text-sm">{gap}</p>
+                <div key={index} className="p-3 bg-white border border-amber-200 rounded-xl">
+                  <p className="text-sm text-amber-900">{gap}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground italic text-sm">
+            <p className="text-amber-700 italic text-sm">
               No obvious structural emphasis gaps detected. Your content hierarchy appears consistent with your positioning priorities.
             </p>
           )}

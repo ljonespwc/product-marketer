@@ -69,12 +69,12 @@ export default function ProcessingPage() {
   const getUrlStatusIcon = (status: ExtractionUrl['scrape_status']) => {
     switch (status) {
       case 'complete':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-emerald-500" />
       case 'failed':
         return <AlertCircle className="h-4 w-4 text-destructive" />
       case 'scraping':
       case 'extracting':
-        return <Loader2 className="h-4 w-4 animate-spin" />
+        return <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
       default:
         return <div className="h-4 w-4 rounded-full bg-muted" />
     }
@@ -92,16 +92,16 @@ export default function ProcessingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <Link
             href="/dashboard"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-orange-600 mb-6 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Dashboard
           </Link>
-          <Card>
+          <Card className="shadow-xl">
             <CardContent className="py-8 text-center">
               <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
               <p className="text-destructive">{error}</p>
@@ -113,24 +113,30 @@ export default function ProcessingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-orange-600 mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
         </Link>
 
-        <Card>
+        <Card className="shadow-xl">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>
+              <CardTitle className="bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">
                 {session?.company_name || 'Loading...'}
               </CardTitle>
               {session && (
-                <Badge variant={session.status === 'processing' ? 'default' : 'secondary'}>
+                <Badge
+                  variant="outline"
+                  className={session.status === 'processing'
+                    ? 'bg-blue-100 text-blue-700 border-blue-200'
+                    : 'bg-amber-100 text-amber-700 border-amber-200'
+                  }
+                >
                   {session.status === 'processing' ? (
                     <>
                       <Loader2 className="h-3 w-3 mr-1 animate-spin" />
@@ -151,7 +157,7 @@ export default function ProcessingPage() {
             {session?.extraction_urls.map((url) => (
               <div
                 key={url.id}
-                className="flex items-center justify-between p-3 border rounded-lg"
+                className="flex items-center justify-between p-3 border rounded-xl bg-white/50"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {getUrlStatusIcon(url.scrape_status)}
@@ -165,7 +171,7 @@ export default function ProcessingPage() {
 
             {session?.status === 'processing' && (
               <div className="flex items-center justify-center gap-2 pt-4 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
                 <span>AI synthesis in progress...</span>
               </div>
             )}

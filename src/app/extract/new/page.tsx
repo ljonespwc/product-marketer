@@ -106,19 +106,19 @@ export default function NewExtractionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-orange-600 mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
         </Link>
 
-        <Card>
+        <Card className="shadow-xl">
           <CardHeader>
-            <CardTitle>New Extraction</CardTitle>
+            <CardTitle className="bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">New Extraction</CardTitle>
             <CardDescription>
               Enter your company name and 3-10 pages from your website to analyze
             </CardDescription>
@@ -133,6 +133,7 @@ export default function NewExtractionPage() {
                   placeholder="e.g., Q1 2026 Positioning Audit"
                   value={sessionName}
                   onChange={(e) => setSessionName(e.target.value)}
+                  className="rounded-xl"
                 />
                 <p className="text-xs text-muted-foreground">
                   Leave blank to auto-generate (e.g., &quot;Acme Inc - Jan 2026&quot;)
@@ -146,6 +147,7 @@ export default function NewExtractionPage() {
                   placeholder="Acme Inc"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
+                  className="rounded-xl"
                 />
               </div>
 
@@ -168,6 +170,7 @@ export default function NewExtractionPage() {
                       }
                       value={url}
                       onChange={(e) => updateUrl(index, e.target.value)}
+                      className="rounded-xl"
                     />
                     {urls.length > 3 && (
                       <Button

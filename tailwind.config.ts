@@ -39,6 +39,55 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Warm color palette
+        warm: {
+          rose: {
+            50: "#fff1f2",
+            100: "#ffe4e6",
+            200: "#fecdd3",
+            300: "#fda4af",
+            400: "#fb7185",
+            500: "#f43f5e",
+            600: "#e11d48",
+          },
+          orange: {
+            50: "#fff7ed",
+            100: "#ffedd5",
+            200: "#fed7aa",
+            300: "#fdba74",
+            400: "#fb923c",
+            500: "#f97316",
+            600: "#ea580c",
+          },
+          amber: {
+            50: "#fffbeb",
+            100: "#fef3c7",
+            200: "#fde68a",
+            300: "#fcd34d",
+            400: "#fbbf24",
+            500: "#f59e0b",
+            600: "#d97706",
+          },
+        },
+        // Score indicator colors
+        score: {
+          excellent: {
+            DEFAULT: "#059669",
+            light: "#d1fae5",
+          },
+          good: {
+            DEFAULT: "#d97706",
+            light: "#fef3c7",
+          },
+          warning: {
+            DEFAULT: "#ea580c",
+            light: "#ffedd5",
+          },
+          poor: {
+            DEFAULT: "#dc2626",
+            light: "#fee2e2",
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

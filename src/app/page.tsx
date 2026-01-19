@@ -4,9 +4,9 @@ import { ArrowRight } from 'lucide-react'
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-background">
+    <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
       <div className="max-w-2xl text-center space-y-6">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">
           Mirror Your Positioning
         </h1>
         <p className="text-xl text-muted-foreground">
