@@ -1,8 +1,18 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // If logged in, go straight to dashboard
+  if (user) {
+    redirect('/dashboard')
+  }
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
       <div className="max-w-2xl text-center space-y-6">
