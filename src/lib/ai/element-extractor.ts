@@ -219,17 +219,22 @@ function extractJsonFromResponse(text: string): string {
 
 /**
  * Extract rich elements with enhanced schema, citations, and contradiction detection
- * Uses gemini-2.0-flash for better quality
+ * Uses gemini-2.5-flash for better quality
  */
 export async function extractRichElements(markdown: string): Promise<RichExtractedElements | null> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
+    })
 
     const result = await model.generateContent(RICH_EXTRACTION_PROMPT + markdown)
     const response = result.response
     const text = response.text()
 
-    // Extract JSON from response (handles markdown code fences)
+    // Extract JSON from response (handles markdown code fences as fallback)
     const jsonStr = extractJsonFromResponse(text)
 
     const parsed = JSON.parse(jsonStr) as RichExtractedElements
@@ -278,11 +283,16 @@ export function richToLegacyElements(rich: RichExtractedElements): ExtractedElem
 
 /**
  * Legacy extraction function for backwards compatibility
- * Uses gemini-2.0-flash-lite (cheaper but less thorough)
+ * Uses gemini-2.5-flash
  */
 export async function extractElements(markdown: string): Promise<ExtractedElements | null> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
+    })
 
     const result = await model.generateContent(LEGACY_EXTRACTION_PROMPT + markdown)
     const response = result.response

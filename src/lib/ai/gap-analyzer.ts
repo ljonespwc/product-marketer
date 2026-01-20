@@ -379,7 +379,12 @@ export async function analyzeGapsWithEvidence(
       .replace('{SYNTHESIS_DATA}', synthesisData)
       .replace('{RAW_CONTENT}', rawContent)
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
+    })
     const result = await model.generateContent(prompt)
     const response = result.response
     const text = response.text()
@@ -450,7 +455,12 @@ export async function analyzeGaps(
     const synthesisData = JSON.stringify(synthesis, null, 2)
     const prompt = LEGACY_GAP_ANALYSIS_PROMPT.replace('{SYNTHESIS_DATA}', synthesisData)
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
+    })
     const result = await model.generateContent(prompt)
     const response = result.response
     const text = response.text()

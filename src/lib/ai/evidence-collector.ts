@@ -160,7 +160,12 @@ ${elementsJson}
 
     const prompt = EVIDENCE_COLLECTION_PROMPT.replace('{PAGES_DATA}', pagesData)
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
+    })
     const result = await model.generateContent(prompt)
     const response = result.response
     const text = response.text()
