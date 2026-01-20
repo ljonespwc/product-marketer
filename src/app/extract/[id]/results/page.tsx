@@ -3,8 +3,7 @@ import { redirect } from 'next/navigation'
 import { FullExtractionData } from '@/types/database'
 import { ResultsTabs } from '@/components/results/ResultsTabs'
 import { ConfirmationPanel } from '@/components/results/ConfirmationPanel'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { ResultsHeader } from '@/components/results/ResultsHeader'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -50,20 +49,11 @@ export default async function ResultsPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-orange-600 mb-6 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
-        </Link>
-
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">{fullData.company_name}</h1>
-          <p className="text-muted-foreground">
-            Positioning analysis from {fullData.extraction_urls.length} pages
-          </p>
-        </div>
+        <ResultsHeader
+          sessionId={id}
+          companyName={fullData.company_name}
+          urlCount={fullData.extraction_urls.length}
+        />
 
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">

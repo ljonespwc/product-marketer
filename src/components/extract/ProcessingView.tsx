@@ -63,7 +63,7 @@ export function ProcessingView({ sessionId }: ProcessingViewProps) {
 
   useEffect(() => {
     if (session && (session.status === 'pending' || session.status === 'processing')) {
-      const interval = setInterval(fetchSession, 2000)
+      const interval = setInterval(fetchSession, 5000)
       return () => clearInterval(interval)
     }
   }, [session, fetchSession])
