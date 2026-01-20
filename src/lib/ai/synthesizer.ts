@@ -10,6 +10,29 @@ import {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
+/**
+ * Helper to extract JSON from LLM response that may be wrapped in markdown code fences
+ */
+function extractJsonFromResponse(text: string): string {
+  let cleaned = text.trim()
+
+  // Remove markdown code fences if present
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '')
+    cleaned = cleaned.replace(/\n?```\s*$/, '')
+  }
+
+  // Find JSON object boundaries as fallback
+  const jsonStart = cleaned.indexOf('{')
+  const jsonEnd = cleaned.lastIndexOf('}')
+
+  if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+    cleaned = cleaned.slice(jsonStart, jsonEnd + 1)
+  }
+
+  return cleaned.trim()
+}
+
 const ENHANCED_SYNTHESIS_PROMPT = `You are a positioning analyst examining a B2B SaaS company's website.
 
 YOUR PERSPECTIVE:
@@ -407,8 +430,7 @@ ${elementsJson}
     const response = result.response
     const text = response.text()
 
-    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text]
-    const jsonStr = jsonMatch[1]?.trim() || text.trim()
+    const jsonStr = extractJsonFromResponse(text)
 
     const parsed = JSON.parse(jsonStr) as EnhancedSynthesisResult
 
@@ -489,8 +511,7 @@ Competitive: ${JSON.stringify(input.elements.competitive_positioning)}
     const response = result.response
     const text = response.text()
 
-    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text]
-    const jsonStr = jsonMatch[1]?.trim() || text.trim()
+    const jsonStr = extractJsonFromResponse(text)
 
     return JSON.parse(jsonStr) as SynthesisResult
   } catch (error) {

@@ -193,6 +193,31 @@ PAGE CONTENT:
 `
 
 /**
+ * Helper to extract JSON from LLM response that may be wrapped in markdown code fences
+ */
+function extractJsonFromResponse(text: string): string {
+  let cleaned = text.trim()
+
+  // Remove markdown code fences if present
+  if (cleaned.startsWith('```')) {
+    // Remove opening fence (```json or ```)
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '')
+    // Remove closing fence
+    cleaned = cleaned.replace(/\n?```\s*$/, '')
+  }
+
+  // Find JSON object boundaries as fallback
+  const jsonStart = cleaned.indexOf('{')
+  const jsonEnd = cleaned.lastIndexOf('}')
+
+  if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+    cleaned = cleaned.slice(jsonStart, jsonEnd + 1)
+  }
+
+  return cleaned.trim()
+}
+
+/**
  * Extract rich elements with enhanced schema, citations, and contradiction detection
  * Uses gemini-2.0-flash for better quality
  */
@@ -204,9 +229,8 @@ export async function extractRichElements(markdown: string): Promise<RichExtract
     const response = result.response
     const text = response.text()
 
-    // Extract JSON from response (may be wrapped in markdown code blocks)
-    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text]
-    const jsonStr = jsonMatch[1]?.trim() || text.trim()
+    // Extract JSON from response (handles markdown code fences)
+    const jsonStr = extractJsonFromResponse(text)
 
     const parsed = JSON.parse(jsonStr) as RichExtractedElements
 
@@ -264,9 +288,8 @@ export async function extractElements(markdown: string): Promise<ExtractedElemen
     const response = result.response
     const text = response.text()
 
-    // Extract JSON from response (may be wrapped in markdown code blocks)
-    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, text]
-    const jsonStr = jsonMatch[1]?.trim() || text.trim()
+    // Extract JSON from response (handles markdown code fences)
+    const jsonStr = extractJsonFromResponse(text)
 
     const parsed = JSON.parse(jsonStr) as ExtractedElements
 
